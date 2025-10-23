@@ -1,0 +1,71 @@
+# Ruff configuration for Spotify Playlist Analyzer
+# Documentation: https://docs.astral.sh/ruff/
+
+# Target Python version
+target-version = "py312"
+
+# Line length for formatting
+line-length = 100
+
+# Indentation
+indent-width = 4
+
+[lint]
+# Enable specific rule sets
+select = [
+    "E",     # pycodestyle errors
+    "W",     # pycodestyle warnings
+    "F",     # Pyflakes
+    "I",     # isort (import sorting)
+    "N",     # pep8-naming
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "SIM",   # flake8-simplify
+    "PTH",   # flake8-use-pathlib
+    "RUF",   # Ruff-specific rules
+]
+
+# Rules to ignore
+ignore = [
+    "E501",    # line too long (handled by formatter)
+    "B008",    # do not perform function calls in argument defaults
+    "SIM108",  # use ternary operator (sometimes reduces readability)
+]
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Allow autofix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+[lint.per-file-ignores]
+# Ignore specific rules in specific files
+"__init__.py" = ["F401"]  # unused imports
+
+[lint.isort]
+# Import sorting configuration
+known-first-party = []
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder"
+]
+
+[lint.mccabe]
+# Maximum complexity for functions
+max-complexity = 10
+
+[format]
+# Format configuration
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+# Formatter will respect magic trailing commas
+docstring-code-format = true
+docstring-code-line-length = 88

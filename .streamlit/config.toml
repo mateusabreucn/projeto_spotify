@@ -1,0 +1,28 @@
+[theme]
+# Tema Spotify - Verde e Preto Fosco Minimalista
+primaryColor = "#1DB954"                    # Verde Spotify (botões, highlights)
+backgroundColor = "#0F1419"                 # Preto fosco muito escuro (fundo principal)
+secondaryBackgroundColor = "#1A1F26"        # Preto fosco claro (cards, sidebar)
+textColor = "#FFFFFF"                       # Branco principal (textos)
+font = "sans serif"
+base = "dark"
+
+[client]
+showErrorDetails = false
+toolbarMode = "minimal"
+showSidebarNavigation = true
+
+[logger]
+level = "error"
+
+[browser]
+gatherUsageStats = false
+serverAddress = "localhost"
+
+[server]
+maxUploadSize = 200
+enableXsrfProtection = true
+
+[ui]
+hideTopBar = false
+hideSidebarNav = false

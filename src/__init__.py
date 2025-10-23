@@ -1,0 +1,1 @@
+"""Spotify Playlist Analyzer - Módulos principais."""
