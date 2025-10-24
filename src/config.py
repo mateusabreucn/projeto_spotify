@@ -1,10 +1,32 @@
 """Configurações centralizadas do projeto."""
 
+import os
 import streamlit as st
+from dotenv import load_dotenv
 
-# Carrega credenciais do Streamlit Secrets
-SPOTIFY_CLIENT_ID = st.secrets.get("SPOTIFY_CLIENT_ID", "").strip()
-SPOTIFY_CLIENT_SECRET = st.secrets.get("SPOTIFY_CLIENT_SECRET", "").strip()
+# Tenta carregar do .env primeiro (para desenvolvimento local)
+load_dotenv()
+
+# Função para obter credenciais com fallback entre secrets e .env
+def _get_spotify_credentials():
+    """Obtém credenciais do Spotify com fallback: st.secrets → .env → variáveis de ambiente."""
+    try:
+        # Tenta st.secrets primeiro (Streamlit Cloud)
+        client_id = st.secrets.get("SPOTIFY_CLIENT_ID", "").strip()
+        client_secret = st.secrets.get("SPOTIFY_CLIENT_SECRET", "").strip()
+        if client_id and client_secret:
+            return client_id, client_secret
+    except (AttributeError, FileNotFoundError, KeyError):
+        # st.secrets não está disponível ou não encontrado
+        pass
+    
+    # Fallback para .env ou variáveis de ambiente
+    client_id = os.getenv("SPOTIFY_CLIENT_ID", "").strip()
+    client_secret = os.getenv("SPOTIFY_CLIENT_SECRET", "").strip()
+    return client_id, client_secret
+
+# Carrega credenciais
+SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET = _get_spotify_credentials()
 
 TOKEN_URL = "https://accounts.spotify.com/api/token"
 API_BASE = "https://api.spotify.com/v1"
