@@ -161,9 +161,7 @@ def load_spotify_dataset_auto(show_section: bool = True):
                     local_df[track_col].astype(str).str.lower().str.contains(query, na=False)
                 ]
             else:
-                matches = local_df[
-                    local_df["artists"].str.lower().str.contains(query, na=False)
-                ]
+                matches = local_df[local_df["artists"].str.lower().str.contains(query, na=False)]
 
             if not matches.empty:
                 st.success(f"Encontradas {len(matches):,} musicas!")
@@ -204,7 +202,7 @@ def show_analysis_section(local_df=None):
     info_section(
         "Cole sua URL de playlist Spotify para descobrir suas vibes musicais. "
         "O sistema analisará cada música e agrupará em clusters temáticos (Vibes).",
-        icon="📊"
+        icon="📊",
     )
 
     # Desabilita o formulário enquanto dataset não carrega
@@ -216,7 +214,10 @@ def show_analysis_section(local_df=None):
         )
         k = st.slider(
             "Quantas Vibes Você Quer? (3-8)",
-            3, 8, 5, 1,
+            3,
+            8,
+            5,
+            1,
             disabled=dataset_is_loading,
         )
 
@@ -238,10 +239,7 @@ def show_analysis_section(local_df=None):
                 st.rerun()
 
     # Exemplos de playlists (também desabilitados se carregando)
-    with st.expander(
-        "💡 Sugestões de Playlists para Testar",
-        expanded=False
-    ):
+    with st.expander("💡 Sugestões de Playlists para Testar", expanded=False):
         if dataset_is_loading:
             st.info("Aguarde o carregamento do dataset para ver sugestões...")
         else:
@@ -290,11 +288,11 @@ def show_analysis_section(local_df=None):
                 total_playlist_tracks = len(_tracks)
 
                 df_tracks = analyze_playlist_with_dataset(pl_url, local_df)
-                
+
                 # Validação: precisa de pelo menos n_clusters músicas encontradas
                 matched_count = len(df_tracks)
                 n_clusters_requested = int(k)
-                
+
                 if matched_count < n_clusters_requested:
                     max_clusters = max(1, matched_count)
                     raise ValueError(
@@ -303,9 +301,9 @@ def show_analysis_section(local_df=None):
                         f"Máximo de clusters recomendado: {max_clusters}. "
                         f"Tente com um valor menor de clusters ou uma playlist com mais músicas."
                     )
-                
-                df_result, vibe_mean, scaled_features, cluster_labels = (
-                    analyze_playlist_vibes(df_tracks, n_clusters=n_clusters_requested)
+
+                df_result, vibe_mean, scaled_features, cluster_labels = analyze_playlist_vibes(
+                    df_tracks, n_clusters=n_clusters_requested
                 )
 
             custom_alert(
@@ -322,9 +320,7 @@ def show_analysis_section(local_df=None):
             matched = len(df_result)
             dataset_size = len(local_df)
             total_playlist_tracks = (
-                total_playlist_tracks
-                if "total_playlist_tracks" in locals()
-                else matched
+                total_playlist_tracks if "total_playlist_tracks" in locals() else matched
             )
 
             pct_by_playlist = (matched / max(1, total_playlist_tracks)) * 100
@@ -332,28 +328,18 @@ def show_analysis_section(local_df=None):
 
             # Métricas em cards customizados
             section_divider("📊 Resumo da Análise")
-            stats_row([
-                {
-                    "label": "Clusters",
-                    "value": int(k),
-                    "icon": "🎭"
-                },
-                {
-                    "label": "Vibes Únicas",
-                    "value": n_vibes_unique,
-                    "icon": "✨"
-                },
-                {
-                    "label": "Faixas Encontradas",
-                    "value": f"{matched}/{total_playlist_tracks}",
-                    "icon": "🎵"
-                },
-                {
-                    "label": "Compatibilidade",
-                    "value": f"{pct_by_playlist:.1f}%",
-                    "icon": "📈"
-                }
-            ])
+            stats_row(
+                [
+                    {"label": "Clusters", "value": int(k), "icon": "🎭"},
+                    {"label": "Vibes Únicas", "value": n_vibes_unique, "icon": "✨"},
+                    {
+                        "label": "Faixas Encontradas",
+                        "value": f"{matched}/{total_playlist_tracks}",
+                        "icon": "🎵",
+                    },
+                    {"label": "Compatibilidade", "value": f"{pct_by_playlist:.1f}%", "icon": "📈"},
+                ]
+            )
 
             # Barra de progresso visual
             progress_bar_custom(
@@ -397,13 +383,32 @@ def show_analysis_section(local_df=None):
             # Info sobre as vibes
             with st.expander("💭 Sobre as Vibes Identificadas", expanded=False):
                 st.write(f"**Vibes encontradas:** {', '.join(vibes_list)}")
-                st.write(
-                    f"**Nota:** Voce selecionou {k} clusters, mas foram identificadas {n_vibes_unique} "
-                    "vibes unicas. Isso é normal quando multiplos clusters compartilham características "
-                    "similares e mapeiam para a mesma vibe."
-                )
 
-            # Métricas principais
+                if n_vibes_unique < int(k):
+                    st.info(
+                        f"""
+                        **🎯 Explicação:**
+
+                        Você selecionou **{k} clusters**, mas foram identificadas **{n_vibes_unique} vibes únicas**.
+
+                        **Por quê?** O algoritmo KMeans descobriu {k} agrupamentos naturais e distintos em sua playlist.
+                        Depois, cada cluster foi mapeado para a vibe mais apropriada baseado em suas características.
+
+                        Alguns clusters compartilham características similares e mapeiam para a **mesma vibe semântica**,
+                        o que é completamente normal! Indica que sua playlist tem variações de um mesmo estilo musical.
+
+                        **Exemplo:**
+                        - Cluster 1 e Cluster 4 → ambos "Party / Upbeat" (mas com características ligeiramente diferentes)
+                        - Cluster 2 e Cluster 5 → ambos "Dark / Intense" (intensidades diferentes)
+
+                        Isso é um **sinal de que o clustering está funcionando corretamente!** ✅
+                        """
+                    )
+                else:
+                    st.success(
+                        f"Você selecionou {k} clusters e foram identificadas {n_vibes_unique} vibes únicas. "
+                        "Cada cluster mapeou para uma vibe diferente! 🎉"
+                    )  # Métricas principais
             metrics = vibe_metrics(df_result["vibe"].values)
             create_metrics_cards(metrics, len(df_result))
 
@@ -426,15 +431,14 @@ def show_analysis_section(local_df=None):
                 "Projeção PCA 2D",
                 "🎨",
                 "Cada ponto representa uma música reduzida a 2 dimensões principais usando PCA (Principal Component Analysis). "
-                "Músicas próximas compartilham características similares. As cores indicam a Vibe atribuída."
+                "Músicas próximas compartilham características similares. As cores indicam a Vibe atribuída.",
             )
             col_a, col_b = st.columns([1, 1])
             with col_a:
-                plot_cluster_scatter(
-                    scaled_features, cluster_labels, df_result["vibe"].values
-                )
+                plot_cluster_scatter(scaled_features, cluster_labels, df_result["vibe"].values)
             with col_b:
-                st.markdown("""
+                st.markdown(
+                    """
                 <div style="
                     background: rgba(29, 185, 84, 0.05);
                     border-left: 3px solid #1DB954;
@@ -461,20 +465,23 @@ def show_analysis_section(local_df=None):
                         <li><strong>Dispersão</strong>: Maior dispersão = maior variedade na playlist</li>
                     </ul>
                 </div>
-                """, unsafe_allow_html=True)
+                """,
+                    unsafe_allow_html=True,
+                )
 
             # Gráfico 2: Distribuição de Vibes
             st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
             chart_section_with_description(
                 "Distribuição de Faixas por Vibe",
                 "📈",
-                "Mostra quantas músicas foram atribuídas a cada Vibe. Vibes com mais barras indicam que sua playlist tem muitas músicas com essas características."
+                "Mostra quantas músicas foram atribuídas a cada Vibe. Vibes com mais barras indicam que sua playlist tem muitas músicas com essas características.",
             )
             col_c, col_d = st.columns([1, 1])
             with col_c:
                 plot_vibe_bars(df_result["vibe"].values)
             with col_d:
-                st.markdown("""
+                st.markdown(
+                    """
                 <div style="
                     background: rgba(29, 185, 84, 0.05);
                     border-left: 3px solid #1DB954;
@@ -500,7 +507,9 @@ def show_analysis_section(local_df=None):
                         <li><strong>Uma vibe dominante</strong>: Playlist temática e focada</li>
                     </ul>
                 </div>
-                """, unsafe_allow_html=True)
+                """,
+                    unsafe_allow_html=True,
+                )
 
             # Gráfico 3: Radar Profile
             st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
@@ -508,7 +517,7 @@ def show_analysis_section(local_df=None):
                 "Perfil de Características por Vibe",
                 "🎯",
                 "Gráfico radar mostrando o perfil médio de cada Vibe. Cada eixo representa uma feature de áudio "
-                "(Energy, Danceability, Valence, etc). Perfis maiores indicam características mais fortes naquela Vibe."
+                "(Energy, Danceability, Valence, etc). Perfis maiores indicam características mais fortes naquela Vibe.",
             )
             plot_radar_by_vibe(df_result)
             st.info(
@@ -523,11 +532,10 @@ def show_analysis_section(local_df=None):
 
             # Top tracks por vibe
             tops = top_tracks_by_cluster(
-                df_result[["track_name", "artists", *list(vibe_mean.keys())]],
+                df_result,
                 scaled_features,
                 cluster_labels,
                 k=5,
-                n_vibes=int(k),
             )
             section_divider("Top Faixas por Vibe")
             display_top_tracks_tables(tops)
@@ -540,7 +548,7 @@ def show_analysis_section(local_df=None):
             # Erros originados de chamadas à API (ex: 404 playlist not found)
             title, body = _format_playlist_error(e)
             custom_alert(title, body, "error")
-        except Exception as e:
+        except Exception:
             # Fallback genérico — mostra mensagem amigável e expõe detalhes em um expander para debug
             import traceback
 
@@ -607,7 +615,9 @@ def show_dataset_explorer_section(local_df):
         ]
 
         # Combina os resultados (remove duplicatas)
-        matches = pd.concat([matches_by_track, matches_by_artist], ignore_index=False).drop_duplicates()
+        matches = pd.concat(
+            [matches_by_track, matches_by_artist], ignore_index=False
+        ).drop_duplicates()
 
         # Exibe resultados
         if not matches.empty:
@@ -684,9 +694,7 @@ def show_dataset_explorer_section(local_df):
     else:
         # Mostra estatísticas do dataset enquanto não há busca
         st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-        st.info(
-            "💡 Digite um termo de busca acima e clique em 🔍 Buscar para explorar o dataset!"
-        )
+        st.info("💡 Digite um termo de busca acima e clique em 🔍 Buscar para explorar o dataset!")
 
         # Estatísticas gerais do dataset
         st.markdown("### 📊 Estatísticas Gerais do Dataset")
@@ -746,14 +754,16 @@ def show_dataset_explorer_section(local_df):
             for col in stats_cols:
                 try:
                     data = local_df[col].astype(float)
-                    stats_summary.append({
-                        "Atributo": col.replace("_", " ").title(),
-                        "Mínimo": f"{data.min():.2f}",
-                        "Máximo": f"{data.max():.2f}",
-                        "Média": f"{data.mean():.2f}",
-                        "Mediana": f"{data.median():.2f}",
-                        "Desvio Padrão": f"{data.std():.2f}"
-                    })
+                    stats_summary.append(
+                        {
+                            "Atributo": col.replace("_", " ").title(),
+                            "Mínimo": f"{data.min():.2f}",
+                            "Máximo": f"{data.max():.2f}",
+                            "Média": f"{data.mean():.2f}",
+                            "Mediana": f"{data.median():.2f}",
+                            "Desvio Padrão": f"{data.std():.2f}",
+                        }
+                    )
                 except (TypeError, ValueError):
                     pass
 

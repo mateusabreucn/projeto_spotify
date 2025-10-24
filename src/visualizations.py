@@ -20,8 +20,8 @@ VIBE_COLORS = {
 }
 
 
-def plot_cluster_scatter(scaled_features: np.ndarray, labels: np.ndarray, vibe_labels: np.ndarray):
-    """Gráfico de dispersão PCA 2D dos clusters."""
+def plot_cluster_scatter(scaled_features: np.ndarray, cluster_labels: np.ndarray, vibe_labels: np.ndarray):
+    """Gráfico de dispersão PCA 2D dos clusters por vibe."""
     pca = PCA(n_components=2, random_state=42)
     xy = pca.fit_transform(scaled_features)
 
@@ -50,8 +50,10 @@ def plot_vibe_bars(vibe_labels: np.ndarray):
     vals = pd.Series(vibe_labels).value_counts()
 
     plt.figure(figsize=(6, 3))
-    plt.bar(vals.index, vals.values, color="#1DB954")
-    plt.xticks(rotation=15, ha="right")
+    colors = [VIBE_COLORS.get(v, "#333") for v in vals.index]
+    plt.bar(range(len(vals)), vals.values, color=colors)
+    plt.xticks(range(len(vals)), vals.index, rotation=15, ha="right")
+    plt.ylabel("Número de Faixas")
     plt.title("Distribuição de Faixas por Vibe")
     plt.tight_layout()
     st.pyplot(plt.gcf())
@@ -60,7 +62,7 @@ def plot_vibe_bars(vibe_labels: np.ndarray):
 def plot_radar_by_vibe(df_out: pd.DataFrame):
     """Gráfico radar com perfil médio de features por vibe."""
     feats = FEATURE_COLS
-    
+
     mm = df_out[feats].astype(float)
     mm = (mm - mm.min()) / (mm.max() - mm.min() + 1e-9)
     means = mm.join(df_out["vibe"]).groupby("vibe")[feats].mean()
@@ -73,8 +75,8 @@ def plot_radar_by_vibe(df_out: pd.DataFrame):
 
     for vibe, row in means.iterrows():
         vals = np.concatenate([row.values, row.values[:1]])
-        ax.plot(angles, vals, linewidth=2, label=vibe)
-        ax.fill(angles, vals, alpha=0.15)
+        ax.plot(angles, vals, "o-", linewidth=2, label=vibe, c=VIBE_COLORS.get(vibe, "#333"))
+        ax.fill(angles, vals, alpha=0.15, c=VIBE_COLORS.get(vibe, "#333"))
 
     ax.set_thetagrids(angles[:-1] * 180 / np.pi, feats, fontsize=9)
     ax.set_title("Perfil Médio de Features por Vibe")

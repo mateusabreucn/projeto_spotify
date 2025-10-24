@@ -9,7 +9,7 @@ import streamlit as st
 @contextmanager
 def section_card(card_type: str = "analysis"):
     """Context manager para renderizar cards de seção.
-    
+
     Args:
         card_type: Tipo de card ('analysis' ou 'dataset')
     """
@@ -192,19 +192,19 @@ def stats_row(stats: Sequence[dict]) -> None:
                     padding: 16px;
                     text-align: center;
                 ">
-                    <div style="font-size: 32px; margin-bottom: 8px;">{stat.get('icon', '')}</div>
+                    <div style="font-size: 32px; margin-bottom: 8px;">{stat.get("icon", "")}</div>
                     <div style="
                         color: rgba(255, 255, 255, 0.6);
                         font-size: 12px;
                         font-weight: 600;
                         text-transform: uppercase;
                         margin-bottom: 8px;
-                    ">{stat.get('label', '')}</div>
+                    ">{stat.get("label", "")}</div>
                     <div style="
                         color: #1DB954;
                         font-size: 24px;
                         font-weight: 800;
-                    ">{stat.get('value', '-')}</div>
+                    ">{stat.get("value", "-")}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -406,7 +406,13 @@ def show_vibe_averages(vibe_mean: dict) -> None:
                     try:
                         val = float(feat_value)
                         val_pct = (val / 1.0) * 100 if val <= 1.0 else val
-                        color = "#1DB954" if val_pct >= 60 else "#FFA500" if val_pct >= 40 else "#FF6B6B"
+                        color = (
+                            "#1DB954"
+                            if val_pct >= 60
+                            else "#FFA500"
+                            if val_pct >= 40
+                            else "#FF6B6B"
+                        )
                     except (TypeError, ValueError):
                         val = feat_value
                         val_pct = 0
@@ -452,4 +458,3 @@ def show_vibe_averages(vibe_mean: dict) -> None:
                         """,
                         unsafe_allow_html=True,
                     )
-
