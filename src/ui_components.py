@@ -321,7 +321,7 @@ def spotify_hero_header() -> None:
                             Spotify Vibes
                         </h1>
                         <p style="margin: 8px 0 0 0; color: rgba(255, 255, 255, 0.95); font-size: 18px; font-weight: 600; letter-spacing: 0.5px;">
-                            Analise as vibrações da sua música com IA
+                            Analise as vibes da sua música com IA
                         </p>
                     </div>
                 </div>
@@ -340,7 +340,7 @@ def spotify_hero_header() -> None:
                                 ⚙️ Como Funciona?
                             </div>
                             <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6;">
-                                Nosso modelo de Machine Learning (K-means) analisa cada música, extraindo features de áudio via Spotify API. Os dados são normalizados e agrupados em clusters dinâmicos (3-8), cada um mapeando para uma vibe semântica.
+                                Nosso modelo de Machine Learning (K-means) analisa cada música, extraindo features de áudio via Spotify. Os dados são normalizados e agrupados em clusters dinâmicos (3-8), cada um mapeando para uma vibe semântica.
                             </p>
                         </div>
                         <div>
@@ -348,7 +348,7 @@ def spotify_hero_header() -> None:
                                 📊 O Dataset
                             </div>
                             <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6;">
-                                Utilizamos um dataset Kaggle de 170k+ músicas com atributos pré-extraídos. Isso permite comparar sua playlist contra uma base massiva, calculando compatibilidade e identificando padrões musicais únicos.
+                                Utilizamos um dataset Kaggle de 900k+ músicas com atributos pré-extraídos. Isso permite comparar sua playlist contra uma base massiva, calculando compatibilidade e identificando padrões musicais únicos.
                             </p>
                         </div>
                         <div>
@@ -401,15 +401,14 @@ def dataset_search_card(disabled: bool = False) -> dict:
                 font-size: 14px;
                 margin-bottom: 16px;
             ">
-                Procure por qualquer música, artista ou característica no dataset de 170k+ faixas
+                Procure por qualquer música, artista ou característica no dataset de 900k+ faixas
             </p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # Usa um container para melhor alinhamento
-    with st.container():
+    with st.form("dataset_search_form", clear_on_submit=False):
         # Cria colunas sem gap para melhor controle
         col1, col2 = st.columns([5, 1], gap="small")
 
@@ -422,14 +421,12 @@ def dataset_search_card(disabled: bool = False) -> dict:
             )
 
         with col2:
-            # Adiciona um espaço vazio para alinhar o botão com o input
-            st.caption("")  # Espaço para compensar altura do label
-            do_search = st.button(
+            st.markdown("<div style='padding-top: 28px;'></div>", unsafe_allow_html=True)
+            do_search = st.form_submit_button(
                 "🔍 Buscar",
                 use_container_width=True,
                 disabled=disabled,
-                key="dataset_search_button",
-                help="Clique para buscar"
+                type="primary",
             )
 
     return {
