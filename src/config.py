@@ -1,13 +1,10 @@
 """Configurações centralizadas do projeto."""
 
-import os
+import streamlit as st
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID", "").strip()
-SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET", "").strip()
+# Carrega credenciais do Streamlit Secrets
+SPOTIFY_CLIENT_ID = st.secrets.get("SPOTIFY_CLIENT_ID", "").strip()
+SPOTIFY_CLIENT_SECRET = st.secrets.get("SPOTIFY_CLIENT_SECRET", "").strip()
 
 TOKEN_URL = "https://accounts.spotify.com/api/token"
 API_BASE = "https://api.spotify.com/v1"
