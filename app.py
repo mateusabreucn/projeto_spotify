@@ -89,9 +89,10 @@ def _format_playlist_error(exc: Exception) -> tuple[str, str]:
     if "404" in low or "resource not found" in low or "not found" in low:
         title = "Playlist Não Encontrada"
         body = (
-            "Não foi possível acessar essa playlist. Tente usar uma playlist pública "
-            "(não criada/gerenciada pela conta oficial do Spotify) e verifique se a URL/ID está correta. "
-            "Exemplos funcionam: playlists públicas de usuários ou playlists oficiais (não privadas)."
+            "Não foi possível acessar essa playlist. Tente usar uma "
+            "playlist pública (não criada/gerenciada pela conta oficial do Spotify) "
+            "e verifique se a URL/ID está correta. Exemplos funcionam: playlists "
+            "públicas de usuários ou playlists oficiais (não privadas)."
         )
         return title, body
 
@@ -176,7 +177,10 @@ def load_spotify_dataset_auto(show_section: bool = True):
     except Exception as e:
         custom_alert(
             "Erro ao Carregar Dataset",
-            f"Nao foi possivel carregar o dataset: {e!s}. Certifique-se de que o kagglehub esta instalado.",
+            (
+                f"Nao foi possivel carregar o dataset: {e!s}. "
+                "Certifique-se de que o kagglehub esta instalado."
+            ),
             "error",
         )
         st.stop()
@@ -297,10 +301,13 @@ def show_analysis_section(local_df=None):
                     max_clusters = max(1, matched_count)
                     raise ValueError(
                         f"Insuficientes músicas encontradas no dataset. "
-                        f"Encontradas: {matched_count}, Clusters solicitados: {n_clusters_requested}. "
+                        f"Encontradas: {matched_count}, "
+                        f"Clusters solicitados: {n_clusters_requested}. "
                         f"Máximo de clusters recomendado: {max_clusters}. "
-                        f"Tente com um valor menor de clusters ou uma playlist com mais músicas."
+                        "Tente com um valor menor de clusters ou uma "
+                        "playlist com mais músicas."
                     )
+
 
                 df_result, vibe_mean, scaled_features, cluster_labels = analyze_playlist_vibes(
                     df_tracks, n_clusters=n_clusters_requested
@@ -389,17 +396,24 @@ def show_analysis_section(local_df=None):
                         f"""
                         **🎯 Explicação:**
 
-                        Você selecionou **{k} clusters**, mas foram identificadas **{n_vibes_unique} vibes únicas**.
+                        Você selecionou **{k} clusters**, mas foram identificadas
+                        **{n_vibes_unique} vibes únicas**.
 
-                        **Por quê?** O algoritmo KMeans descobriu {k} agrupamentos naturais e distintos em sua playlist.
-                        Depois, cada cluster foi mapeado para a vibe mais apropriada baseado em suas características.
+                        **Por quê?** O algoritmo KMeans descobriu {k} agrupamentos
+                        naturais e distintos em sua playlist. Depois, cada cluster
+                        foi mapeado para a vibe mais apropriada baseado em suas
+                        características.
 
-                        Alguns clusters compartilham características similares e mapeiam para a **mesma vibe semântica**,
-                        o que é completamente normal! Indica que sua playlist tem variações de um mesmo estilo musical.
+                        Alguns clusters compartilham características similares e
+                        mapeiam para a **mesma vibe semântica**, o que é completamente
+                        normal! Indica que sua playlist tem variações de um mesmo
+                        estilo musical.
 
                         **Exemplo:**
-                        - Cluster 1 e Cluster 4 → ambos "Party / Upbeat" (mas com características ligeiramente diferentes)
-                        - Cluster 2 e Cluster 5 → ambos "Dark / Intense" (intensidades diferentes)
+                        - Cluster 1 e Cluster 4 → ambos "Party / Upbeat"
+                          (mas com características ligeiramente diferentes)
+                        - Cluster 2 e Cluster 5 → ambos "Dark / Intense"
+                          (intensidades diferentes)
 
                         Isso é um **sinal de que o clustering está funcionando corretamente!** ✅
                         """

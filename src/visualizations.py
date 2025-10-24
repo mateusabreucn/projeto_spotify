@@ -20,7 +20,9 @@ VIBE_COLORS = {
 }
 
 
-def plot_cluster_scatter(scaled_features: np.ndarray, cluster_labels: np.ndarray, vibe_labels: np.ndarray):
+def plot_cluster_scatter(
+    scaled_features: np.ndarray, cluster_labels: np.ndarray, vibe_labels: np.ndarray
+):
     """Gráfico de dispersão PCA 2D dos clusters por vibe."""
     pca = PCA(n_components=2, random_state=42)
     xy = pca.fit_transform(scaled_features)
@@ -118,7 +120,15 @@ def plot_correlation_matrix(df_out: pd.DataFrame):
     for i in range(len(FEATURE_COLS)):
         for j in range(len(FEATURE_COLS)):
             text_color = "white" if abs(corr.iloc[i, j]) > 0.5 else "black"
-            plt.text(j, i, f"{corr.iloc[i, j]:.2f}", ha="center", va="center", color=text_color, fontsize=8)
+            plt.text(
+                j,
+                i,
+                f"{corr.iloc[i, j]:.2f}",
+                ha="center",
+                va="center",
+                color=text_color,
+                fontsize=8,
+            )
 
     plt.tight_layout()
     st.pyplot(plt.gcf())

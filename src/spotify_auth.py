@@ -8,10 +8,10 @@ from .config import API_BASE, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, TOKEN_UR
 
 def get_spotify_token() -> str:
     """Obtém token de acesso com cache em session state.
-    
+
     Returns:
         Token de acesso válido
-        
+
     Raises:
         RuntimeError: Se autenticação falhar
     """
@@ -37,14 +37,14 @@ def get_spotify_token() -> str:
 
 def api_get(path: str, params: dict | None = None) -> requests.Response:
     """Requisição GET autenticada para API Spotify.
-    
+
     Args:
         path: Endpoint (ex: "/playlists/{id}/tracks")
         params: Query string parameters
-        
+
     Returns:
         Response HTTP
-        
+
     Raises:
         RuntimeError: Se requisição falhar
     """

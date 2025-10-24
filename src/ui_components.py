@@ -1,7 +1,7 @@
 """Componentes UI reutilizáveis para Streamlit com design Spotify."""
 
+from collections.abc import Sequence
 from contextlib import contextmanager
-from typing import Sequence
 
 import streamlit as st
 
@@ -181,7 +181,7 @@ def stats_row(stats: Sequence[dict]) -> None:
         return
 
     cols = st.columns(len(stats))
-    for col, stat in zip(cols, stats):
+    for col, stat in zip(cols, stats, strict=False):
         with col:
             st.markdown(
                 f"""
@@ -224,11 +224,13 @@ def chart_section_with_description(title: str, icon: str = "📊", description: 
         ">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
                 <span style="font-size: 28px;">{icon}</span>
-                <h3 style="margin: 0; color: #1DB954; font-size: 18px; font-weight: 700; letter-spacing: -0.5px;">
+                <h3 style="margin: 0; color: #1DB954; font-size: 18px; font-weight: 700;
+                letter-spacing: -0.5px;">
                     {title}
                 </h3>
             </div>
-            <div style="color: rgba(255, 255, 255, 0.7); font-size: 13px; line-height: 1.6; padding-left: 40px;">
+            <div style="color: rgba(255, 255, 255, 0.7); font-size: 13px; line-height: 1.6;
+            padding-left: 40px;">
                 {description}
             </div>
         </div>
@@ -292,7 +294,7 @@ def custom_alert(title: str, message: str, alert_type: str = "info") -> None:
     alert_card(title, message, alert_type)
 
 
-def info_section(text: str, icon: str = "ℹ️") -> None:
+def info_section(text: str, icon: str = "i") -> None:
     """Renderiza seção de informação."""
     st.markdown(
         f"""
@@ -303,7 +305,8 @@ def info_section(text: str, icon: str = "ℹ️") -> None:
             padding: 16px;
             margin: 16px 0;
         ">
-            <p style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0; line-height: 1.6;">
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0;
+            line-height: 1.6;">
                 <span style="font-size: 18px; margin-right: 8px;">{icon}</span>
                 {text}
             </p>

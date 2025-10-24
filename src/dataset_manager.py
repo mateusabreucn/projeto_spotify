@@ -48,7 +48,7 @@ def ensure_dataset_cached() -> Path:
 
 def load_kaggle_dataset() -> pd.DataFrame:
     """Carrega dataset Kaggle com cache Streamlit."""
-    
+
     @st.cache_data(ttl=3600, show_spinner=False)
     def _load_and_process():
         parquet_path = ensure_dataset_cached()

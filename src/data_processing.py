@@ -11,7 +11,7 @@ def _normalize_artists_string(s: str) -> str:
     """Normaliza string de artistas para comparação."""
     if pd.isna(s):
         return ""
-    
+
     txt = str(s)
     for ch in ["[", "]", "'", '"', ";"]:
         txt = txt.replace(ch, "")
@@ -22,7 +22,7 @@ def load_local_dataset(file) -> pd.DataFrame:
     """Carrega dataset local com features de áudio."""
     df = pd.read_csv(file)
     required = {"id", "name", "artists"}
-    
+
     if not required.issubset(df.columns):
         raise ValueError(f"Colunas obrigatórias: {required}")
 

@@ -6,7 +6,7 @@ from .spotify_auth import api_get
 def extract_playlist_id(s: str) -> str | None:
     """Extrai ID da playlist de URL ou string Spotify."""
     s = (s or "").strip()
-    
+
     if s.startswith("spotify:playlist:"):
         s = s.split("spotify:playlist:")[1]
     elif "open.spotify.com/playlist/" in s:
