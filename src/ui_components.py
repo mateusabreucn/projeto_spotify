@@ -1,176 +1,34 @@
-"""Componentes reutilizáveis para UI/UX melhorada com design Spotify premium."""
+"""Componentes UI reutilizáveis para Streamlit com design Spotify."""
 
-from typing import Any
+from contextlib import contextmanager
+from typing import Sequence
 
 import streamlit as st
 
 
-def custom_alert(title: str, message: str, alert_type: str = "info") -> None:
-    """Renderiza alertas customizados e bonitos.
-
+@contextmanager
+def section_card(card_type: str = "analysis"):
+    """Context manager para renderizar cards de seção.
+    
     Args:
-        title: Título do alerta
-        message: Mensagem do alerta
-        alert_type: Tipo de alerta ('info', 'success', 'warning', 'error')
+        card_type: Tipo de card ('analysis' ou 'dataset')
     """
-    icons = {
-        "info": "[i]",
-        "success": "[✓]",
-        "warning": "[!]",
-        "error": "[x]",
-    }
+    class_name = f"section-card-wrapper section-card-{card_type}"
+    wrapper = st.container()
+    wrapper.markdown(f"<div class='{class_name}'>", unsafe_allow_html=True)
 
-    colors = {
-        "info": "#1DB954",  # Verde Spotify
-        "success": "#1DB954",  # Verde
-        "warning": "#FFA500",  # Laranja
-        "error": "#FF6B6B",  # Vermelho
-    }
+    with wrapper.container():
+        yield
 
-    icon = icons.get(alert_type, "[i]")
-    color = colors.get(alert_type, "#1DB954")
-
-    st.markdown(
-        f"""
-        <div style="
-            background-color: rgba(29, 185, 84, 0.1);
-            border-left: 4px solid {color};
-            border-radius: 8px;
-            padding: 16px;
-            margin: 16px 0;
-            backdrop-filter: blur(10px);
-        ">
-            <div style="font-weight: 600; font-size: 16px; margin-bottom: 8px; color: {color};">
-                {icon} {title}
-            </div>
-            <div style="font-size: 14px; color: #E0E0E0; line-height: 1.6;">
-                {message}
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def spotify_header() -> None:
-    """Renderiza header customizado com logo Spotify."""
-    st.markdown(
-        """
-        <div style="
-            background: linear-gradient(135deg, #1DB954 0%, #1aa34a 100%);
-            padding: 32px 24px;
-            border-radius: 12px;
-            margin-bottom: 32px;
-            box-shadow: 0 8px 32px rgba(29, 185, 84, 0.15);
-        ">
-            <div style="
-                display: flex;
-                align-items: center;
-                gap: 16px;
-            ">
-                <div style="
-                    font-size: 48px;
-                    font-weight: bold;
-                    color: white;
-                ">
-                    🎵
-                </div>
-                <div>
-                    <h1 style="
-                        margin: 0;
-                        color: white;
-                        font-size: 32px;
-                        font-weight: 800;
-                        letter-spacing: -0.5px;
-                    ">
-                        Spotify Playlist Analyzer
-                    </h1>
-                    <p style="
-                        margin: 8px 0 0 0;
-                        color: rgba(255, 255, 255, 0.9);
-                        font-size: 14px;
-                        font-weight: 500;
-                    ">
-                        Descubra as vibes da sua playlist com Machine Learning
-                    </p>
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def metric_card(label: str, value: Any, description: str = "", icon: str = "📊") -> None:
-    """Renderiza card de métrica customizado.
-
-    Args:
-        label: Rótulo da métrica
-        value: Valor a exibir
-        description: Descrição opcional
-        icon: Emoji para o card
-    """
-    st.markdown(
-        f"""
-        <div style="
-            background: linear-gradient(135deg, #1A1F26 0%, #141820 100%);
-            border: 1px solid rgba(29, 185, 84, 0.2);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        ">
-            <div style="
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                margin-bottom: 12px;
-            ">
-                <div style="font-size: 28px;">{icon}</div>
-                <div style="
-                    color: rgba(255, 255, 255, 0.7);
-                    font-size: 12px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                ">
-                    {label}
-                </div>
-            </div>
-            <div style="
-                font-size: 28px;
-                font-weight: 800;
-                color: #1DB954;
-                margin-bottom: 8px;
-                letter-spacing: -0.5px;
-            ">
-                {value}
-            </div>
-            {f'<div style="font-size: 12px; color: rgba(255, 255, 255, 0.5);">{description}</div>' if description else ''}
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    wrapper.markdown("</div>", unsafe_allow_html=True)
 
 
 def section_divider(title: str) -> None:
-    """Renderiza divisor de seção customizado.
-
-    Args:
-        title: Título da seção
-    """
+    """Renderiza divisor de seção com título destacado."""
     st.markdown(
         f"""
-        <div style="
-            margin: 40px 0 24px 0;
-        ">
-            <div style="
-                display: flex;
-                align-items: center;
-                gap: 16px;
-                margin-bottom: 16px;
-            ">
+        <div style="margin: 40px 0 24px 0;">
+            <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
                 <div style="
                     width: 4px;
                     height: 32px;
@@ -198,115 +56,8 @@ def section_divider(title: str) -> None:
     )
 
 
-def feature_highlight(title: str, description: str, icon: str = "✨") -> None:
-    """Renderiza destaque de feature.
-
-    Args:
-        title: Título da feature
-        description: Descrição
-        icon: Emoji da feature
-    """
-    st.markdown(
-        f"""
-        <div style="
-            background: rgba(29, 185, 84, 0.05);
-            border: 1px solid rgba(29, 185, 84, 0.15);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-            transition: all 0.2s ease;
-        ">
-            <div style="
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-            ">
-                <div style="font-size: 24px; flex-shrink: 0;">{icon}</div>
-                <div>
-                    <div style="
-                        color: #1DB954;
-                        font-weight: 600;
-                        font-size: 14px;
-                        margin-bottom: 4px;
-                    ">
-                        {title}
-                    </div>
-                    <div style="
-                        color: rgba(255, 255, 255, 0.7);
-                        font-size: 13px;
-                        line-height: 1.5;
-                    ">
-                        {description}
-                    </div>
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def progress_bar_custom(label: str, value: float, total: float = 100.0, icon: str = "📊") -> None:
-    """Renderiza barra de progresso customizada.
-
-    Args:
-        label: Rótulo
-        value: Valor atual
-        total: Valor total
-        icon: Emoji
-    """
-    percentage = (value / max(1, total)) * 100
-    st.markdown(
-        f"""
-        <div style="margin-bottom: 24px;">
-            <div style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 8px;
-            ">
-                <div style="
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    color: rgba(255, 255, 255, 0.8);
-                    font-weight: 600;
-                    font-size: 14px;
-                ">
-                    <span>{icon}</span>
-                    <span>{label}</span>
-                </div>
-                <div style="
-                    color: #1DB954;
-                    font-weight: 700;
-                    font-size: 14px;
-                ">
-                    {percentage:.1f}%
-                </div>
-            </div>
-            <div style="
-                background: #1A1F26;
-                border-radius: 8px;
-                height: 8px;
-                overflow: hidden;
-                border: 1px solid rgba(29, 185, 84, 0.2);
-            ">
-                <div style="
-                    background: linear-gradient(90deg, #1DB954 0%, #1aa34a 100%);
-                    height: 100%;
-                    width: {percentage}%;
-                    transition: width 0.3s ease;
-                    box-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
-                "></div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def spotify_hero_header() -> None:
-    """Renderiza header hero premium com logo, título e grid de explicações (4 colunas)."""
+    """Renderiza cabeçalho principal com visual premium."""
     st.markdown(
         """
         <div style="background: linear-gradient(135deg, #1DB954 0%, #1aa34a 50%, #0F1419 100%); padding: 48px 32px; border-radius: 16px; margin-bottom: 40px; box-shadow: 0 20px 60px rgba(29, 185, 84, 0.2); position: relative; overflow: hidden;">
@@ -332,7 +83,7 @@ def spotify_hero_header() -> None:
                                 🎭 O que são Vibes?
                             </div>
                             <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6;">
-                                Clusters semânticos que representam a atmosfera emocional de suas músicas. Usando 9 atributos de áudio (energia, danceabilidade, valence e mais), agrupamos sua playlist em categorias como Party, Chill, Romantic, Dark e outras vibrações únicas.
+                                Clusters semânticos que representam a atmosfera emocional de suas músicas. Usando 9 atributos de áudio (energia, danceabilidade, valence e mais), agrupamos sua playlist em categorias únicas.
                             </p>
                         </div>
                         <div>
@@ -340,7 +91,7 @@ def spotify_hero_header() -> None:
                                 ⚙️ Como Funciona?
                             </div>
                             <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6;">
-                                Nosso modelo de Machine Learning (K-means) analisa cada música, extraindo features de áudio via Spotify. Os dados são normalizados e agrupados em clusters dinâmicos (3-8), cada um mapeando para uma vibe semântica.
+                                Modelo K-means analisa cada música extraindo features de áudio via Spotify. Dados normalizados são agrupados em clusters dinâmicos (3-8), mapeando para vibes semânticas.
                             </p>
                         </div>
                         <div>
@@ -348,7 +99,7 @@ def spotify_hero_header() -> None:
                                 📊 O Dataset
                             </div>
                             <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6;">
-                                Utilizamos um dataset Kaggle de 900k+ músicas com atributos pré-extraídos. Isso permite comparar sua playlist contra uma base massiva, calculando compatibilidade e identificando padrões musicais únicos.
+                                Dataset Kaggle de 900k+ músicas com atributos pré-extraídos. Permite comparar sua playlist contra base massiva, identificando padrões musicais únicos.
                             </p>
                         </div>
                         <div>
@@ -356,7 +107,7 @@ def spotify_hero_header() -> None:
                                 ✨ O que Agrega?
                             </div>
                             <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6;">
-                                Descubra padrões invisíveis em suas preferências, entenda melhor o estilo da sua playlist, crie recomendações mais precisas, e compartilhe insights únicos sobre suas vibes musicais com amigos e comunidade.
+                                Descubra padrões em suas preferências, entenda estilo da playlist, crie recomendações precisas, compartilhe insights únicos sobre vibes musicais.
                             </p>
                         </div>
                     </div>
@@ -369,14 +120,7 @@ def spotify_hero_header() -> None:
 
 
 def dataset_search_card(disabled: bool = False) -> dict:
-    """Renderiza card de busca inteligente no dataset (busca unificada).
-
-    Args:
-        disabled: Se True, desabilita os inputs (dataset ainda carregando)
-
-    Returns:
-        Dicionário com resultado da busca (sem tipo de busca)
-    """
+    """Renderiza card de busca no dataset com formulário integrado."""
     st.markdown(
         """
         <div style="
@@ -409,7 +153,6 @@ def dataset_search_card(disabled: bool = False) -> dict:
     )
 
     with st.form("dataset_search_form", clear_on_submit=False):
-        # Cria colunas sem gap para melhor controle
         col1, col2 = st.columns([5, 1], gap="small")
 
         with col1:
@@ -429,64 +172,16 @@ def dataset_search_card(disabled: bool = False) -> dict:
                 type="primary",
             )
 
-    return {
-        "query": search_query,
-        "execute": do_search
-    }
+    return {"query": search_query, "execute": do_search}
 
 
-def vibe_info_card(vibe_name: str, description: str, color: str = "#1DB954", icon: str = "[*]") -> None:
-    """Renderiza card informativo sobre uma vibe.
+def stats_row(stats: Sequence[dict]) -> None:
+    """Renderiza linha de estatísticas em cards."""
+    if not stats:
+        return
 
-    Args:
-        vibe_name: Nome da vibe
-        description: Descrição
-        color: Cor da vibe
-        icon: Ícone/emoji
-    """
-    st.markdown(
-        f"""
-        <div style="
-            background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, rgba(29, 185, 84, 0.05) 100%);
-            border-left: 4px solid {color};
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-        ">
-            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                <div style="
-                    font-size: 28px;
-                    min-width: 40px;
-                    text-align: center;
-                ">{icon}</div>
-                <div>
-                    <div style="
-                        color: {color};
-                        font-weight: 700;
-                        font-size: 16px;
-                        margin-bottom: 4px;
-                    ">{vibe_name}</div>
-                    <div style="
-                        color: rgba(255, 255, 255, 0.8);
-                        font-size: 14px;
-                        line-height: 1.5;
-                    ">{description}</div>
-                </div>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-def stats_row(stats: list) -> None:
-    """Renderiza uma linha de estatísticas com cards lado-a-lado.
-
-    Args:
-        stats: Lista de dicts com 'label', 'value', 'icon'
-    """
     cols = st.columns(len(stats))
-    for col, stat in zip(cols, stats, strict=True):
+    for col, stat in zip(cols, stats):
         with col:
             st.markdown(
                 f"""
@@ -496,9 +191,8 @@ def stats_row(stats: list) -> None:
                     border-radius: 12px;
                     padding: 16px;
                     text-align: center;
-                    transition: all 0.3s ease;
                 ">
-                    <div style="font-size: 32px; margin-bottom: 8px;">{stat.get('icon', '[*]')}</div>
+                    <div style="font-size: 32px; margin-bottom: 8px;">{stat.get('icon', '')}</div>
                     <div style="
                         color: rgba(255, 255, 255, 0.6);
                         font-size: 12px;
@@ -517,294 +211,37 @@ def stats_row(stats: list) -> None:
             )
 
 
-def info_section(title: str, icon: str = "[i]") -> None:
-    """Renderiza seção informativa expandível.
-
-    Args:
-        title: Título da seção
-        icon: Ícone
-    """
+def chart_section_with_description(title: str, icon: str = "📊", description: str = "") -> None:
+    """Renderiza cabeçalho com descrição para gráficos."""
     st.markdown(
         f"""
         <div style="
-            background: rgba(29, 185, 84, 0.05);
-            border: 1px solid rgba(29, 185, 84, 0.15);
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, rgba(29, 185, 84, 0.05) 100%);
+            border-left: 4px solid #1DB954;
             border-radius: 8px;
             padding: 16px;
-            margin: 16px 0;
+            margin: 20px 0 16px 0;
         ">
-            <div style="
-                color: #1DB954;
-                font-weight: 700;
-                font-size: 15px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            ">
-                {icon} {title}
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                <span style="font-size: 28px;">{icon}</span>
+                <h3 style="margin: 0; color: #1DB954; font-size: 18px; font-weight: 700; letter-spacing: -0.5px;">
+                    {title}
+                </h3>
+            </div>
+            <div style="color: rgba(255, 255, 255, 0.7); font-size: 13px; line-height: 1.6; padding-left: 40px;">
+                {description}
             </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-
-def input_field_styled(
-    label: str, placeholder: str = "", input_type: str = "text", key: str | None = None
-) -> str:
-    """Campo de entrada customizado com estilo Spotify.
-
-    Args:
-        label: Rótulo do campo
-        placeholder: Texto de placeholder
-        input_type: Tipo do input (text, password)
-        key: Chave única do Streamlit
-
-    Returns:
-        Valor digitado pelo usuário
-    """
-    st.markdown(
-        f"""
-        <div style="margin-bottom: 20px;">
-            <label style="
-                color: rgba(255, 255, 255, 0.8);
-                font-weight: 600;
-                font-size: 14px;
-                display: block;
-                margin-bottom: 8px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            ">
-                {label}
-            </label>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    value = st.text_input(
-        label, placeholder=placeholder, type=input_type, key=key, label_visibility="collapsed"
-    )
-    return value
-
-
-def card_hover(title: str, content: str, icon: str = "📌") -> None:
-    """Card com efeito hover premium.
-
-    Args:
-        title: Título do card
-        content: Conteúdo
-        icon: Emoji do card
-    """
-    html = f"""
-    <div style="
-        background: rgba(29, 185, 84, 0.08);
-        border: 1px solid rgba(29, 185, 84, 0.2);
-        border-radius: 12px;
-        padding: 20px;
-        margin: 12px 0;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    "
-    onmouseover="this.style.background='rgba(29, 185, 84, 0.12)'; this.style.borderColor='rgba(29, 185, 84, 0.4)'; this.style.boxShadow='0 8px 24px rgba(29, 185, 84, 0.15)';"
-    onmouseout="this.style.background='rgba(29, 185, 84, 0.08)'; this.style.borderColor='rgba(29, 185, 84, 0.2)'; this.style.boxShadow='none';"
-    >
-        <div style="
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        ">
-            <div style="font-size: 24px;">{icon}</div>
-            <div style="
-                color: #1DB954;
-                font-weight: 700;
-                font-size: 16px;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            ">
-                {title}
-            </div>
-        </div>
-        <div style="
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            line-height: 1.6;
-            padding-left: 36px;
-        ">
-            {content}
-        </div>
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
-
-
-def badge(text: str, style: str = "success") -> None:
-    """Badge customizado.
-
-    Args:
-        text: Texto do badge
-        style: Estilo (success, warning, info, danger)
-    """
-    colors = {
-        "success": "#1DB954",
-        "warning": "#FFA500",
-        "info": "#00BCD4",
-        "danger": "#FF6B6B",
-    }
-    bg_colors = {
-        "success": "rgba(29, 185, 84, 0.15)",
-        "warning": "rgba(255, 165, 0, 0.15)",
-        "info": "rgba(0, 188, 212, 0.15)",
-        "danger": "rgba(255, 107, 107, 0.15)",
-    }
-
-    color = colors.get(style, "#1DB954")
-    bg_color = bg_colors.get(style, "rgba(29, 185, 84, 0.15)")
-
-    html = f"""
-    <span style="
-        background: {bg_color};
-        color: {color};
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-weight: 600;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: 1px solid {color};
-        display: inline-block;
-        margin: 4px 4px 4px 0;
-    ">
-        {text}
-    </span>
-    """
-    st.markdown(html, unsafe_allow_html=True)
-
-
-def divider_gradient(margin: str = "32px 0") -> None:
-    """Divisor com gradiente Spotify.
-
-    Args:
-        margin: Margem do divisor
-    """
-    html = f"""
-    <div style="
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #1DB954, transparent);
-        margin: {margin};
-        border-radius: 1px;
-    "></div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
-
-
-def stat_card_compact(label: str, value: str, unit: str = "", icon: str = "📊") -> None:
-    """Card de stat compacto e minimalista.
-
-    Args:
-        label: Rótulo
-        value: Valor
-        unit: Unidade
-        icon: Emoji
-    """
-    html = f"""
-    <div style="
-        background: rgba(29, 185, 84, 0.05);
-        border-left: 3px solid #1DB954;
-        padding: 16px;
-        border-radius: 8px;
-        margin: 8px 0;
-    ">
-        <div style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        ">
-            <div>
-                <div style="
-                    color: rgba(255, 255, 255, 0.6);
-                    font-size: 12px;
-                    font-weight: 600;
-                    text-transform: uppercase;
-                    letter-spacing: 0.5px;
-                    margin-bottom: 4px;
-                ">
-                    {label}
-                </div>
-                <div style="
-                    color: #1DB954;
-                    font-size: 24px;
-                    font-weight: 800;
-                    letter-spacing: -0.5px;
-                ">
-                    {value}<span style="font-size: 14px; margin-left: 4px;">{unit}</span>
-                </div>
-            </div>
-            <div style="font-size: 32px; opacity: 0.3;">{icon}</div>
-        </div>
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
-
-
-def chart_section_with_description(
-    title: str,
-    icon: str = "📊",
-    description: str = "",
-) -> None:
-    """Renderiza um header de seção de gráfico com descrição expandível.
-
-    Args:
-        title: Título da seção
-        icon: Emoji para o ícone
-        description: Descrição longa do que o gráfico mostra
-    """
-    html = f"""
-    <div style="
-        background: linear-gradient(135deg, rgba(29, 185, 84, 0.1) 0%, rgba(29, 185, 84, 0.05) 100%);
-        border-left: 4px solid #1DB954;
-        border-radius: 8px;
-        padding: 16px;
-        margin: 20px 0 16px 0;
-    ">
-        <div style="
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
-        ">
-            <span style="font-size: 28px;">{icon}</span>
-            <h3 style="
-                margin: 0;
-                color: #1DB954;
-                font-size: 18px;
-                font-weight: 700;
-                letter-spacing: -0.5px;
-            ">
-                {title}
-            </h3>
-        </div>
-        <div style="
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 13px;
-            line-height: 1.6;
-            padding-left: 40px;
-        ">
-            {description}
-        </div>
-    </div>
-    """
-    st.markdown(html, unsafe_allow_html=True)
 
 
 def section_separator() -> None:
-    """Renderiza um separador visual forte entre seções principais."""
+    """Renderiza separador visual entre seções."""
     st.markdown(
         """
-        <div style="
-            margin-top: 40px;
-            padding: 20px 0;
-            position: relative;
-        ">
+        <div style="margin-top: 40px; padding: 20px 0;">
             <div style="
                 height: 2px;
                 background: linear-gradient(90deg,
@@ -819,3 +256,120 @@ def section_separator() -> None:
         unsafe_allow_html=True,
     )
 
+
+def alert_card(title: str, message: str, alert_type: str = "info") -> None:
+    """Renderiza card de alerta/informação."""
+    colors = {
+        "info": "#1DB954",
+        "warning": "#FFA500",
+        "error": "#FF6B6B",
+    }
+    color = colors.get(alert_type, "#1DB954")
+
+    st.markdown(
+        f"""
+        <div style="
+            background-color: rgba(29, 185, 84, 0.1);
+            border-left: 4px solid {color};
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        ">
+            <div style="font-weight: 600; font-size: 16px; color: {color}; margin-bottom: 8px;">
+                {title}
+            </div>
+            <div style="font-size: 14px; color: #E0E0E0; line-height: 1.6;">
+                {message}
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def custom_alert(title: str, message: str, alert_type: str = "info") -> None:
+    """Renderiza alerta customizado."""
+    alert_card(title, message, alert_type)
+
+
+def info_section(text: str, icon: str = "ℹ️") -> None:
+    """Renderiza seção de informação."""
+    st.markdown(
+        f"""
+        <div style="
+            background: rgba(29, 185, 84, 0.05);
+            border-left: 3px solid #1DB954;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+        ">
+            <p style="color: rgba(255, 255, 255, 0.9); font-size: 14px; margin: 0; line-height: 1.6;">
+                <span style="font-size: 18px; margin-right: 8px;">{icon}</span>
+                {text}
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def feature_highlight(title: str, subtitle: str, icon: str = "✨") -> None:
+    """Renderiza destaque de feature."""
+    st.markdown(
+        f"""
+        <div style="
+            background: linear-gradient(135deg, #1A1F26 0%, #141820 100%);
+            border: 1px solid rgba(29, 185, 84, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+        ">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="font-size: 28px;">{icon}</div>
+                <div>
+                    <div style="color: #1DB954; font-weight: 600; font-size: 14px;">{title}</div>
+                    <div style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">{subtitle}</div>
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def progress_bar_custom(label: str, value: float, max_value: float = 100, icon: str = "📊") -> None:
+    """Renderiza barra de progresso customizada."""
+    percentage = (value / max(1, max_value)) * 100
+    color = "#1DB954" if percentage >= 60 else "#FFA500" if percentage >= 30 else "#FF6B6B"
+
+    st.markdown(
+        f"""
+        <div style="margin: 20px 0;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span style="font-size: 18px;">{icon}</span>
+                <span style="color: rgba(255, 255, 255, 0.8); font-weight: 600; font-size: 14px;">
+                    {label}
+                </span>
+                <span style="color: {color}; font-weight: 700; font-size: 14px; margin-left: auto;">
+                    {percentage:.1f}%
+                </span>
+            </div>
+            <div style="
+                width: 100%;
+                height: 24px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 12px;
+                overflow: hidden;
+                border: 1px solid rgba(29, 185, 84, 0.2);
+            ">
+                <div style="
+                    width: {min(percentage, 100)}%;
+                    height: 100%;
+                    background: linear-gradient(90deg, {color} 0%, {color}cc 100%);
+                    transition: width 0.3s ease;
+                "></div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )

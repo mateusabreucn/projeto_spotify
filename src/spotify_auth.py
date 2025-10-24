@@ -1,62 +1,52 @@
-"""Módulo para autenticação com Spotify usando Client Credentials Flow."""
+"""Autenticação e cliente da API Spotify usando Client Credentials Flow."""
 
 import requests
 import streamlit as st
 
-from .config import SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, TOKEN_URL, API_BASE
+from .config import API_BASE, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, TOKEN_URL
 
 
 def get_spotify_token() -> str:
-    """Obtém token de acesso usando Client Credentials Flow.
-
+    """Obtém token de acesso com cache em session state.
+    
     Returns:
-        str: Token de acesso válido
-
+        Token de acesso válido
+        
     Raises:
-        RuntimeError: Se não conseguir autenticar
+        RuntimeError: Se autenticação falhar
     """
-    # Verifica se há token em cache
     if "spotify_token" in st.session_state:
         return st.session_state.spotify_token
 
-    # Credenciais
     auth = (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET)
-
-    # Dados da requisição
     data = {"grant_type": "client_credentials"}
 
-    # Faz requisição para obter token
     try:
         response = requests.post(TOKEN_URL, auth=auth, data=data, timeout=10)
         response.raise_for_status()
     except requests.RequestException as e:
-        msg = f"Erro ao autenticar com Spotify: {e}"
-        raise RuntimeError(msg) from e
+        raise RuntimeError(f"Erro ao autenticar: {e}") from e
 
-    token_data = response.json()
-    token = token_data.get("access_token")
-
+    token = response.json().get("access_token")
     if not token:
-        msg = "Não foi possível obter token de acesso"
-        raise RuntimeError(msg)
+        raise RuntimeError("Token de acesso não obtido")
 
-    # Armazena em cache
     st.session_state.spotify_token = token
     return token
 
 
 def api_get(path: str, params: dict | None = None) -> requests.Response:
-    """Faz requisição GET autenticada para API do Spotify.
-
+    """Requisição GET autenticada para API Spotify.
+    
     Args:
-        path: Caminho do endpoint (ex: "/playlists/{id}/tracks")
-        params: Parâmetros da query string
-
+        path: Endpoint (ex: "/playlists/{id}/tracks")
+        params: Query string parameters
+        
     Returns:
-        Response: Resposta da API
-
+        Response HTTP
+        
     Raises:
-        RuntimeError: Se falhar na autenticação ou requisição
+        RuntimeError: Se requisição falhar
     """
     token = get_spotify_token()
     headers = {"Authorization": f"Bearer {token}"}
@@ -66,8 +56,7 @@ def api_get(path: str, params: dict | None = None) -> requests.Response:
             f"{API_BASE}{path}",
             headers=headers,
             params=params,
-            timeout=30
+            timeout=30,
         )
     except requests.RequestException as e:
-        msg = f"Erro na requisição da API: {e}"
-        raise RuntimeError(msg) from e
+        raise RuntimeError(f"Erro na requisição: {e}") from e
