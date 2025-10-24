@@ -290,8 +290,22 @@ def show_analysis_section(local_df=None):
                 total_playlist_tracks = len(_tracks)
 
                 df_tracks = analyze_playlist_with_dataset(pl_url, local_df)
+                
+                # Validação: precisa de pelo menos n_clusters músicas encontradas
+                matched_count = len(df_tracks)
+                n_clusters_requested = int(k)
+                
+                if matched_count < n_clusters_requested:
+                    max_clusters = max(1, matched_count)
+                    raise ValueError(
+                        f"Insuficientes músicas encontradas no dataset. "
+                        f"Encontradas: {matched_count}, Clusters solicitados: {n_clusters_requested}. "
+                        f"Máximo de clusters recomendado: {max_clusters}. "
+                        f"Tente com um valor menor de clusters ou uma playlist com mais músicas."
+                    )
+                
                 df_result, vibe_mean, scaled_features, cluster_labels = (
-                    analyze_playlist_vibes(df_tracks, n_clusters=int(k))
+                    analyze_playlist_vibes(df_tracks, n_clusters=n_clusters_requested)
                 )
 
             custom_alert(
@@ -484,7 +498,6 @@ def show_analysis_section(local_df=None):
                         <li><strong>Barras altas</strong>: Vibes dominantes na sua playlist</li>
                         <li><strong>Distribuição balanceada</strong>: Playlist diversa e eclética</li>
                         <li><strong>Uma vibe dominante</strong>: Playlist temática e focada</li>
-                        <li><strong>Hover</strong>: Posicione o mouse para ver exatos números</li>
                     </ul>
                 </div>
                 """, unsafe_allow_html=True)
@@ -527,8 +540,10 @@ def show_analysis_section(local_df=None):
             # Erros originados de chamadas à API (ex: 404 playlist not found)
             title, body = _format_playlist_error(e)
             custom_alert(title, body, "error")
-        except Exception:
-            # Fallback genérico —Não exponha JSON cru ao usuário
+        except Exception as e:
+            # Fallback genérico — mostra mensagem amigável e expõe detalhes em um expander para debug
+            import traceback
+
             custom_alert(
                 "Erro Durante a Analise",
                 (
@@ -537,6 +552,15 @@ def show_analysis_section(local_df=None):
                 ),
                 "error",
             )
+
+            # Log no terminal (útil quando executando localmente)
+            tb = traceback.format_exc()
+            print("[DEBUG] Exception during playlist analysis:")
+            print(tb)
+
+            # Mostra detalhes técnicos em um expander para facilitar debug local
+            with st.expander("🔧 Detalhes técnicos (apenas para debugging)", expanded=False):
+                st.text(tb)
 
 
 def show_dataset_explorer_section(local_df):
