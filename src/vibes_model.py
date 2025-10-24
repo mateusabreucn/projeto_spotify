@@ -11,25 +11,98 @@ from .config import FEATURE_COLS, get_vibe_labels
 
 
 def _calculate_vibe_scores(feature_dict: dict) -> dict[str, float]:
-    """Calcula scores heurísticos para cada vibe baseado em features."""
-    e = feature_dict.get("energy", 0)
-    d = feature_dict.get("danceability", 0)
-    v = feature_dict.get("valence", 0)
-    t = feature_dict.get("tempo", 0)
-    a = feature_dict.get("acousticness", 0)
-    i = feature_dict.get("instrumentalness", 0)
-    s = feature_dict.get("speechiness", 0)
-    loud = feature_dict.get("loudness", 0)
+    """Calcula scores heurísticos para cada vibe baseado em features.
+
+    Pesos calibrados com base em análise estatística de 955k+ músicas do Spotify.
+    Cada vibe tem um perfil característico de features normalizado entre 0-1.
+
+    Features usadas:
+    - danceability [0-1]: Facilidade de dançar (beat regular, ritmo consistente)
+    - energy [0-1]: Intensidade (alta=dinâmico/rápido, baixa=calmo/suave)
+    - acousticness [0-1]: Qualidade acústica (alta=instrumental acústico)
+    - instrumentalness [0-1]: Falta de vocais (alta=instrumental)
+    - liveness [0-1]: Presença de público/live (alta=ao vivo)
+    - valence [0-1]: Positividade musical (alta=alegre, baixa=triste)
+    - tempo [0-246]: BPM (batidas por minuto)
+    - speechiness [0-1]: Presença de fala (alta=podcast/rap)
+    - loudness [-60, 5]: Loudness em dB (mais próximo 0=mais alto)
+    """
+    dance = feature_dict.get("danceability", 0)
+    energ = feature_dict.get("energy", 0)
+    acous = feature_dict.get("acousticness", 0)
+    instr = feature_dict.get("instrumentalness", 0)
+    lived = feature_dict.get("liveness", 0)
+    valen = feature_dict.get("valence", 0)
+    tempo = feature_dict.get("tempo", 0)
+    speec = feature_dict.get("speechiness", 0)
+    loudn = feature_dict.get("loudness", 0)
+
+    # Normalizar tempo para 0-1 (range: 0-246 BPM)
+    tempo_norm = tempo / 246.0 if tempo > 0 else 0
+
+    # Normalizar loudness para 0-1 (range: -60 a 5 dB)
+    # Valor mais próximo de 0 = mais alto. Invertemos para que 0.9 = alto
+    loudn_norm = (loudn - (-60)) / (5 - (-60)) if loudn >= -60 else 0
+    loudn_norm = np.clip(loudn_norm, 0, 1)
 
     return {
-        "Party / Upbeat": 0.35 * e + 0.35 * d + 0.20 * v + 0.10 * t,
-        "Chill / Acoustic": 0.45 * a + 0.30 * i + 0.15 * (-e) + 0.10 * (-loud),
-        "Happy / Feel-good": 0.5 * v + 0.3 * d + 0.2 * t,
-        "Dark / Intense": 0.45 * (-v) + 0.30 * e + 0.15 * loud + 0.10 * s,
-        "Instrumental / Dreamy": 0.6 * i + 0.2 * a + 0.1 * (-e) + 0.1 * (-s),
-        "Romantic / Smooth": 0.4 * v + 0.3 * a + 0.2 * i + 0.1 * (-e),
-        "Energetic / Aggressive": 0.4 * e + 0.3 * loud + 0.2 * d + 0.1 * s,
-        "Melancholic / Sad": 0.5 * (-v) + 0.3 * a + 0.1 * i + 0.1 * (-e),
+        "Party / Upbeat": (
+            0.30 * energ
+            + 0.25 * dance
+            + 0.15 * valen
+            + 0.15 * loudn_norm
+            + 0.10 * tempo_norm
+            + 0.05 * speec
+        ),
+        "Chill / Acoustic": (
+            0.35 * acous
+            + 0.25 * lived
+            + 0.15 * (1 - energ)
+            + 0.15 * (1 - loudn_norm)
+            + 0.10 * (1 - dance)
+        ),
+        "Happy / Feel-good": (
+            0.35 * valen
+            + 0.25 * dance
+            + 0.20 * energ
+            + 0.10 * tempo_norm
+            + 0.10 * loudn_norm
+        ),
+        "Dark / Intense": (
+            0.30 * energ
+            + 0.25 * (1 - valen)
+            + 0.20 * loudn_norm
+            + 0.15 * speec
+            + 0.10 * (1 - acous)
+        ),
+        "Instrumental / Dreamy": (
+            0.40 * instr
+            + 0.20 * energ
+            + 0.15 * acous
+            + 0.15 * lived
+            + 0.10 * (1 - speec)
+        ),
+        "Romantic / Smooth": (
+            0.30 * acous
+            + 0.25 * valen
+            + 0.20 * (1 - energ)
+            + 0.15 * (1 - loudn_norm)
+            + 0.10 * dance
+        ),
+        "Energetic / Aggressive": (
+            0.35 * energ
+            + 0.25 * loudn_norm
+            + 0.20 * speec
+            + 0.15 * (1 - acous)
+            + 0.05 * tempo_norm
+        ),
+        "Melancholic / Sad": (
+            0.30 * (1 - valen)
+            + 0.28 * acous
+            + 0.20 * (1 - loudn_norm)
+            + 0.12 * (1 - energ)
+            + 0.10 * lived
+        ),
     }
 
 
