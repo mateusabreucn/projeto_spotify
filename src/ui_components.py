@@ -461,3 +461,72 @@ def show_vibe_averages(vibe_mean: dict) -> None:
                         """,
                         unsafe_allow_html=True,
                     )
+
+
+def playlist_suggestion_card(
+    name: str,
+    playlist_id: str,
+    spotify_url: str,
+    track_count: int,
+    icon: str = "🎵",
+) -> None:
+    """Renderiza card de playlist sugerida com botões.
+
+    Args:
+        name: Nome da playlist
+        playlist_id: ID da playlist no Spotify
+        spotify_url: URL para abrir no Spotify
+        track_count: Quantidade de músicas
+        icon: Emoji para o card
+    """
+    import streamlit as st
+
+    col1, col2, col3 = st.columns([2, 1.2, 1.2])
+
+    with col1:
+        st.markdown(
+            f"""
+            <div style="
+                background: linear-gradient(135deg, #1A1F26 0%, #141820 100%);
+                border-left: 3px solid #1DB954;
+                border-radius: 8px;
+                padding: 12px;
+                margin: 8px 0;
+                height: 70px;
+                display: flex;
+                align-items: center;
+            ">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 28px;">{icon}</div>
+                    <div>
+                        <div style="color: white; font-weight: 600; font-size: 14px;">{name}</div>
+                        <div style="color: rgba(255, 255, 255, 0.6); font-size: 12px;">
+                        {track_count} músicas
+                        </div>
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    with col2:
+        if st.button(
+            "🎵 Abrir",
+            key=f"open_{playlist_id}",
+            use_container_width=True,
+            help="Abrir no Spotify"
+        ):
+            st.markdown(
+                f"[Abrir no Spotify]({spotify_url})", unsafe_allow_html=True
+            )
+
+    with col3:
+        if st.button(
+            "📋 ID",
+            key=f"copy_{playlist_id}",
+            use_container_width=True,
+            help="Copiar ID",
+        ):
+            st.write(f"`{playlist_id}`")
+

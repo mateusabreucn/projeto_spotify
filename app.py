@@ -14,7 +14,6 @@ from src.ui_components import (
     chart_section_with_description,
     custom_alert,
     dataset_search_card,
-    feature_highlight,
     info_section,
     progress_bar_custom,
     section_divider,
@@ -242,39 +241,13 @@ def show_analysis_section(local_df=None):
             ):
                 st.rerun()
 
-    # Exemplos de playlists (também desabilitados se carregando)
-    with st.expander("💡 Sugestões de Playlists para Testar", expanded=False):
+    # Sugestões de playlists para teste
+    with st.expander("💡 Playlists Sugeridas para Testar", expanded=False):
         if dataset_is_loading:
             st.info("Aguarde o carregamento do dataset para ver sugestões...")
         else:
-            col_left, col_right = st.columns(2)
-            with col_left:
-                st.markdown("### ✅ Excelente Compatibilidade (>80%)")
-                feature_highlight(
-                    "Peaceful Piano",
-                    "ID: 37i9dQZF1DX4sWSpwFbBpm",
-                    icon="🎹",
-                )
-                feature_highlight(
-                    "Rock Classics",
-                    "ID: 37i9dQZF1DXcF1ynTFLUQH",
-                    icon="🎸",
-                )
-
-            with col_right:
-                st.markdown("### ⭐ Boa Compatibilidade (60-80%)")
-                feature_highlight(
-                    "Hoje em Destaque",
-                    "ID: 37i9dQZF1DXcBWIGoYBM5M",
-                    icon="🎤",
-                )
-                feature_highlight(
-                    "Oitenta para Sempre",
-                    "ID: 37i9dQZF1DX4UtSsGT1Sbe",
-                    icon="📻",
-                )
-
-    # Processamento da análise (só executa se dataset está carregado e form foi submetido)
+            from src.playlist_suggestions import render_playlist_suggestions
+            render_playlist_suggestions()
     if run and not dataset_is_loading and local_df is not None:
         if local_df.empty:
             custom_alert(
