@@ -22,6 +22,17 @@ serverAddress = "localhost"
 [server]
 maxUploadSize = 200
 enableXsrfProtection = true
+enableCORS = false
+
+[runner]
+# Otimizações para prevenir timeout durante carregamento de datasets grandes
+fastReruns = true
+# Aumenta timeout de execução para 10 minutos (600 segundos)
+scriptRunTimeout = 600
+
+[global]
+# Limita idade de mensagens em cache para economizar memória
+maxCachedMessageAge = 300
 
 [ui]
 hideTopBar = false
