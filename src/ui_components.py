@@ -795,3 +795,27 @@ def chart_section_with_description(
     """
     st.markdown(html, unsafe_allow_html=True)
 
+
+def section_separator() -> None:
+    """Renderiza um separador visual forte entre seções principais."""
+    st.markdown(
+        """
+        <div style="
+            margin-top: 40px;
+            padding: 20px 0;
+            position: relative;
+        ">
+            <div style="
+                height: 2px;
+                background: linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(29, 185, 84, 0.3) 20%,
+                    rgba(29, 185, 84, 0.6) 50%,
+                    rgba(29, 185, 84, 0.3) 80%,
+                    transparent 100%);
+            "></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+

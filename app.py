@@ -18,6 +18,7 @@ from src.ui_components import (
     info_section,
     progress_bar_custom,
     section_divider,
+    section_separator,
     spotify_hero_header,
     stats_row,
 )
@@ -68,6 +69,9 @@ def main():
 
     # Seção de análise (PRIMEIRA - foco principal)
     show_analysis_section(local_df)
+
+    # Separador visual forte entre seções
+    section_separator()
 
     # Seção de exploração dataset (ÚLTIMA - complementar)
     show_dataset_explorer_section(local_df)
