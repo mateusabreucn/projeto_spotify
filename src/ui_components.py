@@ -373,3 +373,83 @@ def progress_bar_custom(label: str, value: float, max_value: float = 100, icon: 
         """,
         unsafe_allow_html=True,
     )
+
+
+def show_vibe_averages(vibe_mean: dict) -> None:
+    """Exibe as médias das audio features de forma visual."""
+    if not vibe_mean:
+        return
+
+    st.markdown(
+        """
+        <div style="margin: 20px 0;">
+            <p style="color: rgba(255, 255, 255, 0.7); font-size: 13px; margin-bottom: 16px;">
+                Perfil médio de todas as características de áudio da sua playlist:
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    cols_per_row = 3
+    features = list(vibe_mean.items())
+    num_rows = (len(features) + cols_per_row - 1) // cols_per_row
+
+    for row in range(num_rows):
+        cols = st.columns(cols_per_row)
+        for col_idx in range(cols_per_row):
+            feat_idx = row * cols_per_row + col_idx
+            if feat_idx < len(features):
+                feat_name, feat_value = features[feat_idx]
+                with cols[col_idx]:
+                    feat_display = feat_name.replace("_", " ").title()
+                    try:
+                        val = float(feat_value)
+                        val_pct = (val / 1.0) * 100 if val <= 1.0 else val
+                        color = "#1DB954" if val_pct >= 60 else "#FFA500" if val_pct >= 40 else "#FF6B6B"
+                    except (TypeError, ValueError):
+                        val = feat_value
+                        val_pct = 0
+                        color = "#1DB954"
+
+                    st.markdown(
+                        f"""
+                        <div style="
+                            background: linear-gradient(135deg, #1A1F26 0%, #141820 100%);
+                            border: 1px solid rgba(29, 185, 84, 0.15);
+                            border-radius: 12px;
+                            padding: 16px;
+                            text-align: center;
+                        ">
+                            <div style="
+                                color: rgba(255, 255, 255, 0.6);
+                                font-size: 11px;
+                                font-weight: 600;
+                                text-transform: uppercase;
+                                margin-bottom: 8px;
+                                letter-spacing: 0.5px;
+                            ">{feat_display}</div>
+                            <div style="
+                                color: {color};
+                                font-size: 28px;
+                                font-weight: 800;
+                                margin-bottom: 8px;
+                            ">{val:.2f}</div>
+                            <div style="
+                                width: 100%;
+                                height: 4px;
+                                background: rgba(255, 255, 255, 0.1);
+                                border-radius: 2px;
+                                overflow: hidden;
+                            ">
+                                <div style="
+                                    width: {min(val_pct, 100)}%;
+                                    height: 100%;
+                                    background: linear-gradient(90deg, {color} 0%, {color}cc 100%);
+                                "></div>
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+

@@ -19,6 +19,7 @@ from src.ui_components import (
     progress_bar_custom,
     section_divider,
     section_separator,
+    show_vibe_averages,
     spotify_hero_header,
     stats_row,
 )
@@ -520,7 +521,7 @@ def show_analysis_section(local_df=None):
 
             # Médias gerais das features
             section_divider("Vibe Media da Playlist")
-            st.write(vibe_mean)
+            show_vibe_averages(vibe_mean)
 
         except RuntimeError as e:
             # Erros originados de chamadas à API (ex: 404 playlist not found)
