@@ -61,7 +61,7 @@ VIBE_LABELS_EXTENDED = [
 ]
 
 DEFAULT_CLUSTERS = 4
-PAGE_TITLE = "Spotify + Dataset Vibes Clustering"
+PAGE_TITLE = "Spotify Vibes - Classificação"
 LAYOUT = "wide"
 
 

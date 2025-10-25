@@ -204,7 +204,7 @@ def show_analysis_section(local_df=None):
 
     info_section(
         "Cole sua URL de playlist Spotify para descobrir suas vibes musicais. "
-        "O sistema analisará cada música e agrupará em clusters temáticos (Vibes).",
+        "O sistema usará inteligência artificial para classificar cada música automaticamente.",
         icon="📊",
     )
 
@@ -213,14 +213,6 @@ def show_analysis_section(local_df=None):
         pl_url = st.text_input(
             "URL ou ID da Playlist",
             placeholder="https://open.spotify.com/playlist/... ou ID direto",
-            disabled=dataset_is_loading,
-        )
-        k = st.slider(
-            "Quantas Vibes Você Quer? (3-8)",
-            3,
-            8,
-            5,
-            1,
             disabled=dataset_is_loading,
         )
 
@@ -266,24 +258,9 @@ def show_analysis_section(local_df=None):
 
                 df_tracks = analyze_playlist_with_dataset(pl_url, local_df)
 
-                # Validação: precisa de pelo menos n_clusters músicas encontradas
-                matched_count = len(df_tracks)
-                n_clusters_requested = int(k)
-
-                if matched_count < n_clusters_requested:
-                    max_clusters = max(1, matched_count)
-                    raise ValueError(
-                        f"Insuficientes músicas encontradas no dataset. "
-                        f"Encontradas: {matched_count}, "
-                        f"Clusters solicitados: {n_clusters_requested}. "
-                        f"Máximo de clusters recomendado: {max_clusters}. "
-                        "Tente com um valor menor de clusters ou uma "
-                        "playlist com mais músicas."
-                    )
-
-
+                # Classifica vibes usando modelo treinado
                 df_result, vibe_mean, scaled_features, cluster_labels = analyze_playlist_vibes(
-                    df_tracks, n_clusters=n_clusters_requested
+                    df_tracks
                 )
 
             custom_alert(
@@ -310,7 +287,7 @@ def show_analysis_section(local_df=None):
             section_divider("📊 Resumo da Análise")
             stats_row(
                 [
-                    {"label": "Clusters", "value": int(k), "icon": "🎭"},
+                    {"label": "Vibes Detectadas", "value": n_vibes_unique, "icon": "🎭"},
                     {"label": "Vibes Únicas", "value": n_vibes_unique, "icon": "✨"},
                     {
                         "label": "Faixas Encontradas",
@@ -363,46 +340,38 @@ def show_analysis_section(local_df=None):
             # Info sobre as vibes
             with st.expander("💭 Sobre as Vibes Identificadas", expanded=False):
                 st.write(f"**Vibes encontradas:** {', '.join(vibes_list)}")
+                st.info(
+                    f"""
+                    **🎯 Como funciona:**
 
-                if n_vibes_unique < int(k):
-                    st.info(
-                        f"""
-                        **🎯 Explicação:**
+                    O sistema usou um modelo de **Inteligência Artificial** treinado com
+                    **955 mil músicas** para classificar automaticamente cada faixa da sua playlist.
 
-                        Você selecionou **{k} clusters**, mas foram identificadas
-                        **{n_vibes_unique} vibes únicas**.
+                    Foram identificadas **{n_vibes_unique} vibes únicas** entre suas músicas:
+                    {', '.join(vibes_list)}
 
-                        **Por quê?** O algoritmo KMeans descobriu {k} agrupamentos
-                        naturais e distintos em sua playlist. Depois, cada cluster
-                        foi mapeado para a vibe mais apropriada baseado em suas
-                        características.
+                    **Como o modelo classifica:**
+                    - Analisa 9 características de áudio (danceability, energy, valence, etc)
+                    - Usa Random Forest com 200 árvores de decisão
+                    - Acurácia de ~85% no conjunto de teste
+                    - Classificação consistente (mesma música = mesma vibe sempre)
 
-                        Alguns clusters compartilham características similares e
-                        mapeiam para a **mesma vibe semântica**, o que é completamente
-                        normal! Indica que sua playlist tem variações de um mesmo
-                        estilo musical.
+                    **Por que usar IA ao invés de agrupamento simples?**
+                    ✅ Resultados consistentes e previsíveis
+                    ✅ Aprende padrões complexos dos dados
+                    ✅ Vibes semanticamente significativas
+                    ✅ Escalável para novas músicas
+                    """
+                )
 
-                        **Exemplo:**
-                        - Cluster 1 e Cluster 4 → ambos "Party / Upbeat"
-                          (mas com características ligeiramente diferentes)
-                        - Cluster 2 e Cluster 5 → ambos "Dark / Intense"
-                          (intensidades diferentes)
-
-                        Isso é um **sinal de que o clustering está funcionando corretamente!** ✅
-                        """
-                    )
-                else:
-                    st.success(
-                        f"Você selecionou {k} clusters e foram identificadas {n_vibes_unique} vibes únicas. "
-                        "Cada cluster mapeou para uma vibe diferente! 🎉"
-                    )  # Métricas principais
+            # Métricas principais
             metrics = vibe_metrics(df_result["vibe"].values)
             create_metrics_cards(metrics, len(df_result))
 
             # Tabela principal
             section_divider("Faixas e Vibes")
             st.dataframe(
-                df_result[["track_name", "artists", "vibe", "cluster"]],
+                df_result[["track_name", "artists", "vibe"]],
                 width="stretch",
             )
 
@@ -418,7 +387,7 @@ def show_analysis_section(local_df=None):
                 "Projeção PCA 2D",
                 "🎨",
                 "Cada ponto representa uma música reduzida a 2 dimensões principais usando PCA (Principal Component Analysis). "
-                "Músicas próximas compartilham características similares. As cores indicam a Vibe atribuída.",
+                "Músicas próximas compartilham características similares. As cores indicam a Vibe classificada pelo modelo.",
             )
             col_a, col_b = st.columns([1, 1])
             with col_a:
@@ -446,9 +415,9 @@ def show_analysis_section(local_df=None):
                         padding-left: 20px;
                         line-height: 1.8;
                     ">
-                        <li><strong>Clusters</strong>: Agrupamentos de músicas com características similares</li>
+                        <li><strong>Classificação</strong>: Cada música foi classificada por IA</li>
                         <li><strong>Cores</strong>: Cada Vibe recebe uma cor diferente</li>
-                        <li><strong>Proximidade</strong>: Pontos próximos = músicas similares</li>
+                        <li><strong>Proximidade</strong>: Pontos próximos = características similares</li>
                         <li><strong>Dispersão</strong>: Maior dispersão = maior variedade na playlist</li>
                     </ul>
                 </div>
@@ -461,7 +430,7 @@ def show_analysis_section(local_df=None):
             chart_section_with_description(
                 "Distribuição de Faixas por Vibe",
                 "📈",
-                "Mostra quantas músicas foram atribuídas a cada Vibe. Vibes com mais barras indicam que sua playlist tem muitas músicas com essas características.",
+                "Mostra quantas músicas foram classificadas em cada Vibe pelo modelo de IA. Vibes com mais barras indicam que sua playlist tem muitas músicas com essas características.",
             )
             col_c, col_d = st.columns([1, 1])
             with col_c:

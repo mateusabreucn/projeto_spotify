@@ -69,7 +69,7 @@ def spotify_hero_header() -> None:
                     </div>
                     <div>
                         <h1 style="margin: 0; color: white; font-size: 48px; font-weight: 900; letter-spacing: -1px; text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); line-height: 1.1;">
-                            Spotify Vibes
+                            Spotify Vibes - Classificação
                         </h1>
                         <p style="margin: 8px 0 0 0; color: rgba(255, 255, 255, 0.95); font-size: 18px; font-weight: 600; letter-spacing: 0.5px;">
                             Analise as vibes da sua música com IA
@@ -83,7 +83,7 @@ def spotify_hero_header() -> None:
                                 🎭 O que são Vibes?
                             </div>
                             <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6;">
-                                Clusters semânticos que representam a atmosfera emocional de suas músicas. Usando 9 atributos de áudio (energia, danceabilidade, valence e mais), agrupamos sua playlist em categorias únicas.
+                                Categorias semânticas que representam a atmosfera emocional de suas músicas. Usando 9 atributos de áudio (energia, danceabilidade, valence e mais), classificamos sua playlist em categorias significativas.
                             </p>
                         </div>
                         <div>
@@ -91,7 +91,7 @@ def spotify_hero_header() -> None:
                                 ⚙️ Como Funciona?
                             </div>
                             <p style="margin: 0; color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6;">
-                                Modelo K-means analisa cada música extraindo features de áudio via Spotify. Dados normalizados são agrupados em clusters dinâmicos (3-8), mapeando para vibes semânticas.
+                                Modelo de IA (Random Forest) treinado com 955 mil músicas classifica automaticamente cada faixa. O sistema extrai features de áudio e prediz a vibe mais adequada com 85% de acurácia.
                             </p>
                         </div>
                         <div>
