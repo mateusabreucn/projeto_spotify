@@ -57,14 +57,14 @@ def ensure_dataset_cached() -> Path:
         # OTIMIZAÇÃO CRÍTICA: Carrega apenas colunas específicas
         # Isso evita carregar Lyrics, key, mode e outras colunas pesadas
         print(f"📥 Carregando dataset de: {source_csv}")
-        
+
         # Lê apenas o header para verificar colunas disponíveis
         df_header = pd.read_csv(source_csv, nrows=0)
         available_cols = df_header.columns.tolist()
-        
+
         # Filtra apenas as colunas que existem E que precisamos
         cols_to_load = [col for col in REQUIRED_COLUMNS if col in available_cols]
-        
+
         print(f"✅ Colunas selecionadas ({len(cols_to_load)}): {', '.join(cols_to_load)}")
         print(f"❌ Colunas ignoradas: Lyrics, key, mode e outras (~{len(available_cols) - len(cols_to_load)} colunas)")
         # Carrega CSV APENAS com as colunas selecionadas
